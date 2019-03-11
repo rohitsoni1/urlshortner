@@ -4,17 +4,15 @@ import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Query;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
+import com.shorturl.Constants;
 import com.shorturl.exception.ShortUrlException;
-
-import lombok.NoArgsConstructor;
+import com.shorturl.repository.SequenceRepo;
 
 /**
  * SeqCounterServiceImpl class is used for creating sequence value for short
@@ -25,24 +23,24 @@ import lombok.NoArgsConstructor;
  *
  */
 @Service
-@NoArgsConstructor
 public class SeqCounterServiceImpl implements SeqCounterService {
 
-	/**
-	 * EntityManagerFactory variable which is used for getting the sequence value
-	 * from database.
-	 */
-	@Autowired
-	private EntityManagerFactory emf;
 	/**
 	 * AtomicLong value manages thread safe increment of sequence value.
 	 */
 	private AtomicLong c;
 	/**
-	 * endCounter maintains the buffered size which control when to 
-	 * query database sequence to get the next value.
+	 * endCounter maintains the buffered size which control when to query database
+	 * sequence to get the next value.
 	 */
 	private Long endCounter;
+
+	/**
+	 * sequenceRepo provide interface for getting the next index value from
+	 * sequence.
+	 */
+	@Autowired
+	private SequenceRepo sequenceRepo;
 
 	/**
 	 * Environment files for reading application configuration
@@ -55,9 +53,12 @@ public class SeqCounterServiceImpl implements SeqCounterService {
 	 * during the initialization of
 	 */
 	@PostConstruct
-	public void loadCurrentCounter() {
+	public void processInit() {
 		getNextSequence();
-		this.endCounter = c.get() + Long.parseLong(env.getProperty("counter.buffer.size"));
+		String bufferSize = StringUtils.isEmpty(env.getProperty(Constants.BUFFER_SIZE_KEY))
+				? Constants.DEFAULT_BUFFER_SIZE
+				: env.getProperty(Constants.BUFFER_SIZE_KEY);
+		this.endCounter = c.get() + Long.parseLong(bufferSize);
 	}
 
 	/**
@@ -69,13 +70,17 @@ public class SeqCounterServiceImpl implements SeqCounterService {
 	 * @return nextCounter calculated value
 	 */
 	public Long increment() {
-		long nextCounter = c.incrementAndGet();
-		if (nextCounter > endCounter) {
-			getNextSequence();
-			nextCounter = c.incrementAndGet();
-			return nextCounter;
+		if (c != null) {
+			long nextCounter = c.incrementAndGet();
+			if (nextCounter > endCounter) {
+				getNextSequence();
+				nextCounter = c.incrementAndGet();
+				return nextCounter;
+			} else {
+				return nextCounter;
+			}
 		} else {
-			return nextCounter;
+			throw new ShortUrlException("Unable to generate next sequence, please retry", null, false, false);
 		}
 	}
 
@@ -88,12 +93,9 @@ public class SeqCounterServiceImpl implements SeqCounterService {
 	 * the sequence which is by how much value sequence needs to be incremented.
 	 */
 	private void getNextSequence() {
-		EntityManager em = emf.createEntityManager();
-		Query query = em.createNativeQuery("select counter_seq.nextval");
-		BigInteger num = (BigInteger) query.getSingleResult();
+		BigInteger num = sequenceRepo.getNextSequence();
 		c = new AtomicLong(num.longValue());
-		this.endCounter = num.longValue() + Long.parseLong(env.getProperty("counter.buffer.size"));
-		em.close();
+		this.endCounter = num.longValue() + Long.parseLong(env.getProperty(Constants.BUFFER_SIZE_KEY));
 	}
 
 	/**
@@ -113,7 +115,7 @@ public class SeqCounterServiceImpl implements SeqCounterService {
 	public String generateSeqeunce(Long num) {
 		if (num != null && num > 0) {
 			StringBuilder sb = new StringBuilder();
-			String baseString = env.getProperty("url.base.string");
+			String baseString = env.getProperty(Constants.BASE_STRING_KEY);
 			// lopping indefinitely
 			while (true) {
 				// continues till value is greater than 0

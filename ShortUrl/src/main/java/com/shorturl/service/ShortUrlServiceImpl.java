@@ -4,9 +4,11 @@ import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.shorturl.Constants;
 import com.shorturl.entity.ShortUrl;
 import com.shorturl.exception.NotFoundException;
 import com.shorturl.exception.ShortUrlException;
@@ -37,7 +39,12 @@ public class ShortUrlServiceImpl implements ShortUrlService {
 	 */
 	@Autowired
 	private UrlRepo urlRepo;
-	
+
+	/**
+	 * Environment files for reading application configuration
+	 */
+	@Autowired
+	private Environment env;
 
 	/**
 	 * generateShortUrl contains business logic for incrementing the counter
@@ -62,10 +69,16 @@ public class ShortUrlServiceImpl implements ShortUrlService {
 			BeanUtils.copyProperties(urlBean, shortUrl);
 			log.debug("After copying the input request to entity object");
 			shortUrl.setShortUrl(shortHash);
+			// saving the data in database
 			ShortUrl createObj = urlRepo.save(shortUrl);
+			// TODO after saving the value in database we need to push it to Cache
+			// server(Redis) so that user can access it faster.
 			log.debug("Saved the new long url and short url in database ");
 			UrlBean respBean = new UrlBean();
 			BeanUtils.copyProperties(createObj, respBean);
+			StringBuilder sb = new StringBuilder();
+			sb.append(env.getProperty(Constants.URL_PREFIX)).append(respBean.getShortUrl());
+			respBean.setShortUrl(sb.toString());
 			log.info("after saving short url");
 			return respBean;
 		} else {
@@ -101,9 +114,10 @@ public class ShortUrlServiceImpl implements ShortUrlService {
 	public UrlBean populate(ShortUrl data) {
 		UrlBean respBean = new UrlBean();
 		BeanUtils.copyProperties(data, respBean);
+		StringBuilder sb = new StringBuilder();
+		sb.append(env.getProperty(Constants.URL_PREFIX)).append(respBean.getShortUrl());
+		respBean.setShortUrl(sb.toString());
 		return respBean;
 	}
-
-
 
 }

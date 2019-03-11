@@ -39,7 +39,7 @@ public class ShortUrlServiceImplTest {
 	String longUrl = "http://google.com";
 	Long counterVal = 100000000000000001l;
 	ShortUrl urlEntity = new ShortUrl(shortHash, longUrl, new Date(), new Date());
-	UrlBean urlBean = new UrlBean(longUrl, null);
+	UrlBean urlBean = new UrlBean(longUrl, null,null);
 
 	@Before
 	public void setup() {

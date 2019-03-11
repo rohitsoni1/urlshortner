@@ -2,6 +2,8 @@ package com.shorturl.controller;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Date;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -32,11 +34,11 @@ public class ShortUrlControllerTest {
 	private ShortUrlService shortUrlService;
 
 	String shortUrl = "http://localhost:8080/1234567";
-	UrlBean urlBean2 = new UrlBean("http://google.com", "http://localhost:8080/1234567");
+	UrlBean urlBean2 = new UrlBean("http://google.com", "http://localhost:8080/1234567",new Date());
 
 	@Test
 	public void generateShortUrl() throws Exception {
-		UrlBean urlBean = new UrlBean("http://google.com", "");
+		UrlBean urlBean = new UrlBean("http://google.com", "",new Date());
 		Mockito.when(shortUrlService.generateShortUrl(Mockito.any(UrlBean.class))).thenReturn(urlBean2);
 		ObjectMapper mapper = new ObjectMapper();
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/url").accept(MediaType.APPLICATION_JSON)
@@ -48,7 +50,7 @@ public class ShortUrlControllerTest {
 
 	@Test
 	public void generateShortUrlNull() throws Exception {
-		UrlBean urlBean = new UrlBean(null, "");
+		UrlBean urlBean = new UrlBean(null, "",new Date());
 		Mockito.when(shortUrlService.generateShortUrl(Mockito.any(UrlBean.class))).thenReturn(urlBean2);
 		ObjectMapper mapper = new ObjectMapper();
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/url").accept(MediaType.APPLICATION_JSON)
@@ -60,7 +62,7 @@ public class ShortUrlControllerTest {
 
 	@Test
 	public void generateShortUrlEmpty() throws Exception {
-		UrlBean urlBean = new UrlBean("", "");
+		UrlBean urlBean = new UrlBean("", "",new Date());
 		Mockito.when(shortUrlService.generateShortUrl(Mockito.any(UrlBean.class))).thenReturn(urlBean2);
 		ObjectMapper mapper = new ObjectMapper();
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/url").accept(MediaType.APPLICATION_JSON)
@@ -91,7 +93,7 @@ public class ShortUrlControllerTest {
 						+ "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddedededdddddddddddddddddddddddddddddddddddd"
 						+ "ddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddedededdddddddddddddddddddddddddddddddddddddddd"
 						+ "dccddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddedededdddddddddddddddddddddddddddddddddddd",
-				"");
+				"",new Date());
 		Mockito.when(shortUrlService.generateShortUrl(Mockito.any(UrlBean.class))).thenReturn(urlBean2);
 		ObjectMapper mapper = new ObjectMapper();
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/url").accept(MediaType.APPLICATION_JSON)
@@ -103,7 +105,7 @@ public class ShortUrlControllerTest {
 
 	@Test
 	public void generateShortUrlMinOutofRange() throws Exception {
-		UrlBean urlBean = new UrlBean("http://ww", "");
+		UrlBean urlBean = new UrlBean("http://ww", "",new Date());
 		Mockito.when(shortUrlService.generateShortUrl(Mockito.any(UrlBean.class))).thenReturn(urlBean2);
 		ObjectMapper mapper = new ObjectMapper();
 		RequestBuilder requestBuilder = MockMvcRequestBuilders.post("/url").accept(MediaType.APPLICATION_JSON)
@@ -119,7 +121,7 @@ public class ShortUrlControllerTest {
 		RequestBuilder requestBuilder=MockMvcRequestBuilders.get("/1234567").contentType(MediaType.APPLICATION_JSON);
 		MvcResult result=mockMvc.perform(requestBuilder).andReturn();
 		MockHttpServletResponse resp=result.getResponse();
-		UrlBean urlBean = new UrlBean("http://google.com", "http://localhost:8080/1234567");
+		UrlBean urlBean = new UrlBean("http://google.com", "http://localhost:8080/1234567",new Date());
 		ObjectMapper mapper = new ObjectMapper();
 		assertEquals(HttpStatus.OK.value(), resp.getStatus());
 		JSONAssert.assertEquals(mapper.writeValueAsString(urlBean), resp.getContentAsString(), false);
