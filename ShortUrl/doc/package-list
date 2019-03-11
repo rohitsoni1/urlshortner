@@ -1,0 +1,8 @@
+com.shorturl
+com.shorturl.config
+com.shorturl.controller
+com.shorturl.entity
+com.shorturl.exception
+com.shorturl.repository
+com.shorturl.service
+com.shorturl.view.bean

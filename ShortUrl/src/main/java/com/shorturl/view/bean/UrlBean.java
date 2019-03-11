@@ -7,6 +7,7 @@ import javax.validation.constraints.Size;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Class used for response for the url shortening API. It is also used in 
@@ -16,6 +17,7 @@ import lombok.Data;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class UrlBean implements Serializable {
 	/**
 	 * Stores Long Url for which user wants to generate short url
@@ -26,7 +28,5 @@ public class UrlBean implements Serializable {
 	/**
 	 * Stores Short Url which user generated for long url
 	 */
-	@NotEmpty
-	@Size(min=10,max=1000)
 	private String shortUrl;
 }
