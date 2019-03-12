@@ -16,6 +16,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.shorturl.entity.ShortUrl;
+import com.shorturl.exception.ShortUrlException;
 import com.shorturl.repository.SequenceRepo;
 import com.shorturl.view.bean.UrlBean;
 
@@ -48,5 +49,31 @@ public class SeqCounterServiceImplTest {
 		Mockito.when(env.getProperty(Mockito.anyString())).thenReturn("10000");
 		seqCounterService.processInit();
 		seqCounterService.increment();
+	}
+	
+	@Test
+	public void generateSeqeunceTest()throws Exception{
+		Mockito.when(sequence.getNextSequence()).thenReturn(new BigInteger("10000000"));
+		Mockito.when(env.getProperty(Mockito.anyString())).thenReturn("10000");
+		seqCounterService.processInit();
+		seqCounterService.generateSeqeunce(10000l);
+	}
+	
+	@Test
+	public void generateSeqeunceTestNullNum()throws Exception{
+		exception.expect(ShortUrlException.class);
+		Mockito.when(sequence.getNextSequence()).thenReturn(new BigInteger("10000000"));
+		Mockito.when(env.getProperty(Mockito.anyString())).thenReturn("10000");
+		seqCounterService.processInit();
+		seqCounterService.generateSeqeunce(null);
+	}
+	
+	@Test
+	public void generateSeqeunceTestZeroNum()throws Exception{
+		exception.expect(ShortUrlException.class);
+		Mockito.when(sequence.getNextSequence()).thenReturn(new BigInteger("10000000"));
+		Mockito.when(env.getProperty(Mockito.anyString())).thenReturn("10000");
+		seqCounterService.processInit();
+		seqCounterService.generateSeqeunce(0l);
 	}
 }

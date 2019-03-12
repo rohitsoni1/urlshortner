@@ -36,6 +36,7 @@ public class ShortUrlServiceImplTest {
 	public final ExpectedException exception = ExpectedException.none();
 
 	String shortHash = "1234567";
+	String shortUrl = "http://localhost:8080/";
 	String longUrl = "http://google.com";
 	Long counterVal = 100000000000000001l;
 	ShortUrl urlEntity = new ShortUrl(shortHash, longUrl, new Date(), new Date());
@@ -51,11 +52,13 @@ public class ShortUrlServiceImplTest {
 		Mockito.when(urlRepo.save(Mockito.any(ShortUrl.class))).thenReturn(urlEntity);
 		Mockito.when(counter.increment()).thenReturn(counterVal);
 		Mockito.when(counter.generateSeqeunce(Mockito.anyLong())).thenReturn(shortHash);
-		Mockito.when(env.getProperty(Mockito.anyString()))
+		Mockito.when(env.getProperty(Mockito.eq("url.base.string")))
 				.thenReturn("Ds3K9ZNvWmHcakr1oPnxh4qpMEzAye8wX5IdJ2LFujUgtC07lOTb6GYBQViSfR");
+		Mockito.when(env.getProperty(Mockito.eq("url.prefix")))
+		.thenReturn(shortUrl);
 		UrlBean urlBean1 = shortUrlService.generateShortUrl(urlBean);
 		assertEquals(urlBean1.getLongUrl(), urlBean.getLongUrl());
-		assertEquals(urlBean1.getShortUrl(), shortHash);
+		assertEquals(urlBean1.getShortUrl(), shortUrl+shortHash);
 	}
 
 	@Test
@@ -73,7 +76,7 @@ public class ShortUrlServiceImplTest {
 		Mockito.when(counter.generateSeqeunce(Mockito.anyLong())).thenReturn(null);
 		shortUrlService.generateShortUrl(urlBean);
 	}
-	/*
+	
 	@Test
 	public void generateShortUrlTestNullSequence()  throws Exception{
 		exception.expect(ShortUrlException.class);
@@ -81,13 +84,6 @@ public class ShortUrlServiceImplTest {
 		Mockito.when(counter.generateSeqeunce(Mockito.anyLong())).thenReturn(shortHash);
 		shortUrlService.generateShortUrl(urlBean);
 	}
-	
-	@Test
-	public void generateShortUrlTestZeroSequence()  throws Exception{
-		exception.expect(ShortUrlException.class);
-		Mockito.when(counter.increment()).thenReturn(0l);
-		Mockito.when(counter.generateSeqeunce(Mockito.anyLong())).thenReturn(shortHash);
-		shortUrlService.generateShortUrl(urlBean);
-	}*/
+
 
 }
