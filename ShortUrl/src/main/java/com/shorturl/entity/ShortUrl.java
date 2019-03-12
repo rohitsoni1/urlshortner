@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.Type;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import com.shorturl.Constants;
+import com.shorturl.constants.Constants;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

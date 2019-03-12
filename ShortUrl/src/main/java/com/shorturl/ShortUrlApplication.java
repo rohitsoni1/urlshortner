@@ -7,7 +7,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.core.env.Environment;
 import org.springframework.util.StringUtils;
 
+import com.shorturl.constants.Constants;
+
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
 @SpringBootApplication
+@EnableSwagger2
 public class ShortUrlApplication implements CommandLineRunner {
 	/**
 	 * Environment files for reading application configuration

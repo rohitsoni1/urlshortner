@@ -10,7 +10,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
-import com.shorturl.Constants;
+import com.shorturl.constants.Constants;
 import com.shorturl.exception.ShortUrlException;
 import com.shorturl.repository.SequenceRepo;
 
