@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.URL;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.shorturl.Constants;
+import com.shorturl.constants.Constants;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.shorturl;
+package com.shorturl.constants;
 /**
  * Constant class stores all the repeating values used in application.
  * @author rohit
