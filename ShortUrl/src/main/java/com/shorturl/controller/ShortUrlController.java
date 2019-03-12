@@ -1,10 +1,11 @@
 package com.shorturl.controller;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,7 +43,7 @@ public class ShortUrlController {
 	public UrlBean generateShortUrl(@Valid @RequestBody UrlBean urlBean, HttpServletRequest request) {
 		UrlBean response=null;
 		log.info("Started on shortening the url from user ");
-		shortUrlService.generateShortUrl(urlBean);
+		response= shortUrlService.generateShortUrl(urlBean);
 				
 		return response;		
 	}
@@ -53,12 +54,15 @@ public class ShortUrlController {
 	 * @return, method return short url and given long url in the response.
 	 */
 	@GetMapping(value="/{shortUrl}",produces="application/json")
-	public UrlBean getLongUrl(@PathVariable(value="shortUrl") String shortUrl, HttpServletRequest request) {
-		UrlBean response=null;
+	public void getLongUrl(@PathVariable(value="shortUrl") String shortUrl, HttpServletRequest request,
+				HttpServletResponse response) {
+		UrlBean urlBean=null;
 		log.info("Started on getting long url for short url");
-		shortUrlService.getLongUrl(shortUrl);		
-				
-		return response;		
+		urlBean=shortUrlService.getLongUrl(shortUrl);		
+		response.setStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+//		response.setStatus(HttpServletResponse.SC_TEMPORARY_REDIRECT);
+        response.setHeader(HttpHeaders.LOCATION, urlBean.getLongUrl());
+        response.setHeader(HttpHeaders.CONNECTION, "close");	
 	}
 	
 }

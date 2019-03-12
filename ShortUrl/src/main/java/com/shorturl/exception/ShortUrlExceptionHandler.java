@@ -16,17 +16,33 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import com.shorturl.view.bean.ErrorResponse;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @ControllerAdvice
 public class ShortUrlExceptionHandler extends ResponseEntityExceptionHandler {
-
+	/**
+	 * Generic handler if nothing matches.
+	 * @param ex
+	 * @param request
+	 * @return
+	 */
 	@ExceptionHandler(Exception.class)
 	public final ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
-		ErrorResponse err = new ErrorResponse(new Date(), ex.getMessage(), request.getDescription(false));
+		log.error("Error occurred check the trace ",ex);
+		ErrorResponse err = new ErrorResponse(new Date(), "UnKnown error has occurred, please retry later", request.getDescription(false));
 		return new ResponseEntity<>(err, HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
+	/**
+	 * Handles Data Not found scenario.
+	 * @param ex
+	 * @param request
+	 * @return
+	 */
 	@ExceptionHandler(NotFoundException.class)
 	public final ResponseEntity<ErrorResponse> handleUserNotFoundException(NotFoundException ex, WebRequest request) {
+		log.error("Error occurred check the trace ",ex);
 		ErrorResponse err = new ErrorResponse(new Date(), ex.getMessage(), request.getDescription(false));
 		return new ResponseEntity<>(err, HttpStatus.NOT_FOUND);
 	}
@@ -34,6 +50,7 @@ public class ShortUrlExceptionHandler extends ResponseEntityExceptionHandler {
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
+		log.error("Validation error has occurred" );
 		List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
 		List<ErrorResponse> errorRspList = new ArrayList<>();
 		for (FieldError fieldError : fieldErrors) {
@@ -45,5 +62,7 @@ public class ShortUrlExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		return new ResponseEntity<>(errorRspList, HttpStatus.BAD_REQUEST);
 	}
+	
+
 
 }

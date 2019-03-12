@@ -13,15 +13,10 @@ import com.shorturl.view.bean.ErrorResponse;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-	@ExceptionHandler(Exception.class)
-	public final ResponseEntity<ErrorResponse> handleAllExceptions(Exception ex, WebRequest request) {
-		ErrorResponse err = new ErrorResponse(new Date(), ex.getMessage(), request.getDescription(false));
-		return new ResponseEntity<>(err, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
 
 	@ExceptionHandler(HttpMessageNotReadableException.class)
 	public final ResponseEntity<ErrorResponse> handleEmptyPayloadExceptions(HttpMessageNotReadableException ex, WebRequest request) {
-		ErrorResponse err = new ErrorResponse(new Date(), ex.getMessage(), request.getDescription(false));
-		return new ResponseEntity<>(err, HttpStatus.INTERNAL_SERVER_ERROR);
+		ErrorResponse err = new ErrorResponse(new Date(), "Invalid request data sent, unable to parse it.", request.getDescription(false));
+		return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
 	}
 }
